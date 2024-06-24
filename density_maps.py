@@ -25,11 +25,23 @@ def colouring_stup(clr1,clr2):
   custom_cmap = mcolors.LinearSegmentedColormap.from_list("mix", colors)
   return custom_cmap
 
-def density_map_prep(lipid_density,tot_density,prot_density):
+def lipid_density_map_prep(lipid_density,tot_density):
   load_lipid_data=np.loadtxt(lipid_density)
   load_tot_lipid_data=np.loadtxt(tot_density)
-  load_prot_data=np.loadtxt(tot_denstiy)
-  init_density=data_list[1:,1:]
+  init_lipid_density=load_lipid_data[1:,1:]
+  init_tot_lipid_density=load_tot_lipid_data[1:,1:]
+  normalized_lipid_dens= 100*(init_lipid_density  /init_tot_lipid_density)
+  return normalized_lipid_dens
+  
+def prot_density_map_prep(prot_density):
+  load_prot_data=np.loadtxt(prot_denstiy)
+  prot_density=load_prot_data[1:,1:]
+  x=load_prot_data[0,1:] 
+  y=load_prot_data[1:,0]
+  return x,y,prot_density
+  
+  
+  
   
 
   
