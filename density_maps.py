@@ -39,8 +39,44 @@ def prot_density_map_prep(prot_density):
   x=load_prot_data[0,1:] 
   y=load_prot_data[1:,0]
   return x,y,prot_density
+
+def prot_mask(lipid_density_list,prot_density,x,y):
+  protein_data=np.zeros_like(prot_density)
+  for j in range(len(x)):
+    for k in range(len(y)):
+      if prot_density[j,k]>0.0000000:
+        protein_data[j,k]=1
+      else:
+        continue 
+  for l in range(len(x)):
+    for m in range(len(y)):
+      for lipid in lipid_density_list:
+        if lipid[l,m]> 20:
+          protein_data[l,m]=0  
+        else:
+          continue
+  mask = np.zeros_like(protein_data, dtype=bool)
+  for n in range(len(x)):
+    for o in range(len(y)):
+      if protein_data[n,o]>0: 
+        mask[n,o] = True 
+  return mask
   
-  
+  def plt_masked_density(lipid_density,mask,x,y,lipid_name,custom_cmap,norm_max):
+    masked_lipid_density=np.ma.masked_array(lipid_density,mask)
+    plt.figure(figsize=(20,20))
+    a=plt.imshow(masked_lipid_density,origin='lower',interpolation='nearest',cmap=custom_cmap,norm=Normalize(vmin=0, vmax=norm_max))#,extent=[xi.min(),xi.max(),yi.min(),yi.max()]) )
+    cbar=plt.colorbar(a)
+    cbar.ax.tick_params(labelsize=20)
+    plt.xlabel('X [nm]',fontsize = 30,weight='bold')
+    plt.ylabel('Y [nm]',fontsize = 30,weight='bold')
+    plt.yticks(fontsize=20,weight='bold')
+    plt.xticks(fontsize=20,weight='bold')
+    plt.title('%s'%(lipid_name),fontsize=30,weight='bold')
+    plt.tight_layout()
+    plt.savefig('%s.png'%(lipid_name))
+    return 
+    
   
   
 
