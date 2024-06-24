@@ -17,3 +17,20 @@ import matplotlib.cm as cm
 from matplotlib.colors import LogNorm
 import matplotlib.colors as colors
 import matplotlib.colors as mcolors
+
+def colouring_stup(clr1,clr2):
+  clr1_cmap = plt.cm.get_cmap(clr1)
+  clr2_cmap = plt.cm.get_cmap(clr2)
+  colors = np.vstack((clr1_cmap(np.linspace(0, 1, 256)), clr2_cmap(np.linspace(0, 1, 256))))
+  custom_cmap = mcolors.LinearSegmentedColormap.from_list("mix", colors)
+  return custom_cmap
+
+def density_map_prep(lipid_density,tot_density,prot_density):
+  load_lipid_data=np.loadtxt(lipid_density)
+  load_tot_lipid_data=np.loadtxt(tot_density)
+  load_prot_data=np.loadtxt(tot_denstiy)
+  init_density=data_list[1:,1:]
+  
+
+  
+
