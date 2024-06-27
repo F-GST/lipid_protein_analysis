@@ -1,30 +1,89 @@
-#calculate the DE index
-# make trajectory that contains only the the GL1 atoms of lipids and the protein 
 import numpy as np
-import matplotlib.pyplot as plt
 import mdtraj as md
-import pandas as pd
-import sys
-import os
+import itertools
+from itertools import *
+import matplotlib.pyplot as plt
 
-trajectory=sys.argv[2]
-topology_file=sys.argv[3]
-output=sys.argv[1]
+
+###### selection parameters, input and output files nd data paths #######
+lipid='DPSG'
+sel_1 = "resname %s name GL1" %(lipid)
+sel_2 = "name SC1"
+
+threshold = 10 # distance threshold in Angstrom
+
+
+trajectory = '1jb0_mon_native_SC1_GL1_up.xtc' # path to the trajectory file
+topology_file = '1jb0_mon_native_SC1_GL1_up.gro' # path to the topology file
+
+output = 'C:/user/folder/' # path where results will be saved
+
+
+######## loading input files ########################
+
 traj=md.load(trajectory,top=topology_file)
+traj.unitcell_angles = None
+traj.unitcell_lengths = None
+traj.unitcell_vectors = None	
 
-def get_distance(p, q):
-    s_sq_difference = 0
-    for p_i,q_i in zip(p,q):
-        s_sq_difference += (p_i - q_i)**2
-        distance = s_sq_difference**0.5
-    return distance
+###################### compute distances matrix ###########################
+
+idx_1 = traj.topology.select(sel_1)
+idx_2 = traj.topology.select(sel_2)
+for i in idx_1:
+    idx_pairs=[]
+    for j in idx_2:
+        idx_pairs.append((i,j))
+    arr = np.array(idx_pairs)
+    distances=md.compute_distances(traj, arr)*10
+    binary_interactions=(distances<threshold).astype(int) # convert distances to binary information/contact map
+    trans_mtx=binary_interaction.transpose()
+
+
+
+
+
+
+
+
+
 
 def compute_lipid_interaction_matrix(traj,topology_file,output,lipid_name):
     top=traj.topology
     all_lipids=traj.xyz[:,top.select("name GL1")]
     prot_xyz_all=traj.xyz[:,top.select("name SC1")]
     frames=len(all_lipids)
-    lipid_interaction_matrix=np.
+    lipid_interaction_matrix=np.zeros((len(#residues),frames))
+    for i in range(bframes):
+        for j in range(residues): 
+            lipid_interaction_matrix[i,j]=get_distance(i,j)
+    return lipid_interaction_matrix
+
+def compute_corr_matrix(lipid_interaction_matrix):
+    
+
+
+
+
+
+
+
+
+def compute_correlation_matrix(A,B):
+    A = sparse.vstack((A, B), format='csr')
+    A = A.astype(np.float64)
+    n = A.shape[1]
+    # Compute the covariance matrix
+    rowsum = A.sum(1)
+    centering = rowsum.dot(rowsum.T.conjugate()) / n
+    C = (A.dot(A.T.conjugate()) - centering) / (n - 1)
+    # The correlation coefficients are given by
+    # C_{i,j} / sqrt(C_{i} * C_{j})
+    d = np.diag(C)
+    corrcoefs = C / np.sqrt(np.outer(d, d))
+    return corrcoefs
+            
+    
     
     
   
