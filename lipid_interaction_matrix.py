@@ -3,20 +3,21 @@ import mdtraj as md
 import itertools
 from itertools import *
 import matplotlib.pyplot as plt
+from scipy import sparse
 
 
 ###### selection parameters, input and output files nd data paths #######
-lipid='DPSG'
+lipid='OPMG'
 sel_1 = "resname %s name GL1" %(lipid)
 sel_2 = "name SC1"
 
-threshold = 10 # distance threshold in Angstrom
+threshold = 1 # distance threshold in Angstrom
 
 
 trajectory = '1jb0_mon_native_SC1_GL1_up.xtc' # path to the trajectory file
 topology_file = '1jb0_mon_native_SC1_GL1_up.gro' # path to the topology file
 
-output = 'C:/user/folder/' # path where results will be saved
+#output = 'C:/user/folder/' # path where results will be saved
 
 
 ######## loading input files ########################
@@ -28,21 +29,29 @@ traj.unitcell_vectors = None
 
 ###################### compute distances matrix ###########################
 
-idx_1 = traj.topology.select(sel_1)
+idx_1 = traj.topology.select(sel_1)    
 idx_2 = traj.topology.select(sel_2)
+all_lipids=[]
 for i in idx_1:
     idx_pairs=[]
     for j in idx_2:
         idx_pairs.append((i,j))
     arr = np.array(idx_pairs)
-    distances=md.compute_distances(traj, arr)*10
+    distances=md.compute_distances(traj, arr)
     binary_interactions=(distances<threshold).astype(int) # convert distances to binary information/contact map
-    trans_mtx=binary_interaction.transpose()
-
-
-
-
-
+    trans=binary_interactions.transpose()
+    sA = sparse.csr_matrix(trans) 
+    print(sA)
+    correlation_matrix = np.corrcoef(trans)
+    print(correlation_matrix)
+    
+    all_lipids.append(binary_interactions.transpose())
+    
+    correlation_matrix = np.corrcoef(binary_interactions.transpose())
+    
+all_lipids_arr=np.array(all_lipids)
+contact_info = coo_matrix((data, (row, col)), shape=(self._nresi_per_protein, ncol_start))
+self.interaction_corrcoef = sparse_corrcoef(contact_info)
 
 
 
